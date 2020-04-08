@@ -8,11 +8,13 @@ namespace uTinyRipper.BundleFiles
 		/// <summary>
 		/// 5.3.0 and greater
 		/// </summary>
-		private static bool HasBlockInfo(BundleGeneration generation) => generation >= BundleGeneration.BF_530_x;
+		private static bool HasBlockInfo(BundleType type, BundleGeneration generation) =>
+			// Hack: fix UnityFS <530 gen parsing
+			type == BundleType.UnityFS || generation >= BundleGeneration.BF_530_x;
 
 		public void Read(BundleReader reader)
 		{
-			if (HasBlockInfo(reader.Generation))
+			if (HasBlockInfo(reader.Type, reader.Generation))
 			{
 				Unknown0 = reader.ReadInt32();
 				Unknown1 = reader.ReadInt32();

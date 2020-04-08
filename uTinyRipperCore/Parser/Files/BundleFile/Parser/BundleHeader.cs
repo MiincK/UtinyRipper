@@ -103,7 +103,8 @@ namespace uTinyRipper.BundleFiles
 
 		private void ReadFileStream(EndianReader reader)
 		{
-			if (Generation < BundleGeneration.BF_530_x)
+			// Hack: fix UnityFS <530 gen parsing
+			if (Type != BundleType.UnityFS && Generation < BundleGeneration.BF_530_x)
 			{
 				throw new NotSupportedException("File stream supports only 530 and greater generations");
 			}

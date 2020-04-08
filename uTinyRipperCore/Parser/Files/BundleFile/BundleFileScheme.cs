@@ -45,9 +45,10 @@ namespace uTinyRipper
 				Header.Read(reader);
 			}
 
-			using (BundleReader reader = new BundleReader(stream, EndianType.BigEndian, Header.Generation))
+			using (BundleReader reader = new BundleReader(stream, EndianType.BigEndian, Header.Type, Header.Generation))
 			{
-				if (reader.Generation < BundleGeneration.BF_530_x)
+				// Hack: fix UnityFS <530 gen parsing
+				if (Header.Type != BundleType.UnityFS &&reader.Generation < BundleGeneration.BF_530_x)
 				{
 					ReadPre530Metadata(reader, out Stream dataStream, out long metadataOffset);
 					ReadPre530Data(dataStream, metadataOffset);
@@ -79,7 +80,7 @@ namespace uTinyRipper
 						ChunkInfo chunkInfo = Header.ChunkInfos[Header.ChunkInfos.Count - 1];
 						MemoryStream stream = new MemoryStream(new byte[chunkInfo.DecompressedSize]);
 						SevenZipHelper.DecompressLZMASizeStream(reader.BaseStream, chunkInfo.CompressedSize, stream);
-						using (BundleReader decompressReader = new BundleReader(stream, reader.EndianType, reader.Generation))
+						using (BundleReader decompressReader = new BundleReader(stream, reader.EndianType, reader.Type, reader.Generation))
 						{
 							Metadata.Read(decompressReader);
 						}
@@ -119,7 +120,7 @@ namespace uTinyRipper
 						using (MemoryStream stream = new MemoryStream(new byte[Header.MetadataDecompressedSize]))
 						{
 							SevenZipHelper.DecompressLZMASizeStream(reader.BaseStream, Header.MetadataCompressedSize, stream);
-							using (BundleReader decompressReader = new BundleReader(stream, reader.EndianType, reader.Generation))
+							using (BundleReader decompressReader = new BundleReader(stream, reader.EndianType, reader.Type, reader.Generation))
 							{
 								Metadata.Read(decompressReader);
 							}
@@ -142,7 +143,7 @@ namespace uTinyRipper
 							}
 
 							stream.Position = 0;
-							using (BundleReader decompressReader = new BundleReader(stream, reader.EndianType, reader.Generation))
+							using (BundleReader decompressReader = new BundleReader(stream, reader.EndianType, reader.Type, reader.Generation))
 							{
 								Metadata.Read(decompressReader);
 							}

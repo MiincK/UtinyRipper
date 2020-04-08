@@ -2,14 +2,15 @@ namespace uTinyRipper.BundleFiles
 {
 	public sealed class BundleFileEntry : FileEntry, IBundleReadable
 	{
-		public static bool HasBlobIndex(BundleGeneration generation)
+		public static bool HasBlobIndex(BundleType type, BundleGeneration generation)
 		{
-			return generation >= BundleGeneration.BF_530_x;
+			// Hack: fix UnityFS <530 gen parsing
+			return type == BundleType.UnityFS || generation >= BundleGeneration.BF_530_x;
 		}
 
 		public void Read(BundleReader reader)
 		{
-			if (HasBlobIndex(reader.Generation))
+			if (HasBlobIndex(reader.Type, reader.Generation))
 			{
 				Offset = reader.ReadInt64();
 				Size = reader.ReadInt64();
